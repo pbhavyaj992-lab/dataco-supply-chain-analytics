@@ -1,0 +1,8 @@
+DATACO — RECONCILIATION (computed from the real file, 2026-11-13)
+Raw rows: 180519 | columns: 53
+Unique Order_Id: 65752 (rows are order-line level; one row per Order_Item_Id)
+Late delivery rate (mean of Late_delivery_risk): 54.83%
+Total Sales: 36,784,735.13 | Total Order_Item_Total: 33,054,402.48
+Total Order_Profit_Per_Order: 3,966,902.97
+LEAKAGE: see leakage_check_*.csv — Delivery_Status 'Late delivery' rows are almost all Late_delivery_risk=1, and 'Advance shipping'/'Shipping on time' rows are almost all 0. Any model using Delivery_Status, Days_for_shipping_(real) or shipping_date as inputs is leaking the answer. Honest late-delivery analysis uses only information known at order time (scheduled days, shipping mode, market, department, category).
+Dropped from clean file (PII / unusable): Customer_Email, Customer_Password, Customer_Street, Customer_Fname, Customer_Lname, Product_Description, Product_Image

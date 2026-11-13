@@ -1,0 +1,5 @@
+Delivery_Status,count,mean,late_rate_pct
+Advance shipping,41592,0.0,0.0
+Late delivery,98977,1.0,100.0
+Shipping canceled,7754,0.0,0.0
+Shipping on time,32196,0.0,0.0

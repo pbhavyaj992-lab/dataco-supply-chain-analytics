@@ -1,0 +1,77 @@
+# DataCo Supply Chain Analytics
+
+**Dataset:** DataCo Smart Supply Chain Dataset (DataCo Global / DataCo International)
+**Scale:** 180,519 rows x 53 columns (one row per order line); 65,752 unique orders; 20,652 customers; Jan 2015 – Jan 2018.
+
+## Business question
+Where is profit leaking — late delivery by market, shipping mode, department and category — and what actually predicts late delivery?
+
+## Licence and commercial use
+**Licence: CC0 Public Domain according to a Kaggle-metadata audit — but that rests on a single source, so treat this project as PORTFOLIO-ONLY until a browser re-check confirms CC0. Do not sell it or redistribute the data until that check is done.**
+
+## Data source and how to reproduce
+Source: Kaggle dataset `shashwatwork/dataco-smart-supply-chain-for-big-data-analysis` — https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis
+Kaggle needs an account to download, so the file used here came from the public Hugging Face mirror `alalfi/SupplyChainDataset` (file `DataCoSupplyChainDataset1.csv`, same 180,519 rows x 53 columns). To reproduce from the official source, download from Kaggle and place `DataCoSupplyChainDataset.csv` in `data/raw/`, then run `python3 scripts/01_clean_analyse.py`.
+
+**Status: REAL DATA PROCESSED.** Every figure below was computed from the real
+dataset by `scripts/01_clean_analyse.py`. Nothing is fabricated. See
+`output/reconciliation.txt` for the full reconciliation.
+
+## Key figures (from `output/kpis.txt`)
+- raw_rows: 180519
+- raw_columns: 53
+- clean_columns: 50
+- duplicate_rows: 0
+- orders_unique_order_id: 65752
+- customers_unique: 20652
+- late_delivery_rate_pct: 54.83
+- total_sales: 36784735.13
+- total_order_item_total: 33054402.48
+- total_benefit_per_order: 3966902.98
+- total_profit_per_order: 3966902.97
+- avg_days_shipping_real: 3.5
+- avg_days_shipment_scheduled: 2.93
+- date_min: 2015-01-01
+- date_max: 2018-01-31
+- markets: 5
+- departments: 11
+- categories: 50
+- product_description_missing_pct: 100.0
+- order_zipcode_missing_pct: 86.24
+
+## What the data actually says
+- LEAKAGE — the headline warning: Delivery_Status almost IS the label. Every one of the 98,977 'Late delivery' rows has Late_delivery_risk = 1, and every 'Advance shipping', 'Shipping on time' and 'Shipping canceled' row has 0. Any model scoring ~97% by using Delivery_Status, Days_for_shipping_(real) or shipping_date is leaking the answer. This project makes no such claim.
+- The real driver is shipping mode, not market: First Class is late 95.3% of the time, Second Class 76.6%, Same Day 45.7%, Standard Class 38.1%. Premium shipping fails most — that is the operational problem.
+- Late rates are flat across markets (54.4% LATAM to 55.2% Europe) and departments (all near 55%), so this is not a regional or category problem.
+- Overall late-delivery rate is 54.83% — more than half of all order lines arrive late.
+- 18.7% of order lines lose money (Benefit_per_order < 0): 33,784 lines, USD -3,883,547.35 of benefit. Total profit per order across the file is USD 3,966,902.98 on USD 36,784,735.13 of sales.
+- Product_Description is 100% missing and Order_Zipcode is 86.24% missing; both were dropped from the clean file, along with customer email, password, street and name (PII).
+
+## The decision this answers
+Stop selling First Class as a premium promise until its 95.3% late rate is fixed, and renegotiate or re-route Second Class. Do not build a 'late delivery predictor' on Delivery_Status — predict from scheduled days, mode, market and department only.
+
+## Reconciliation
+```
+DATACO — RECONCILIATION (computed from the real file, 2026-11-13)
+Raw rows: 180519 | columns: 53
+Unique Order_Id: 65752 (rows are order-line level; one row per Order_Item_Id)
+Late delivery rate (mean of Late_delivery_risk): 54.83%
+Total Sales: 36,784,735.13 | Total Order_Item_Total: 33,054,402.48
+Total Order_Profit_Per_Order: 3,966,902.97
+LEAKAGE: see leakage_check_*.csv — Delivery_Status 'Late delivery' rows are almost all Late_delivery_risk=1, and 'Advance shipping'/'Shipping on time' rows are almost all 0. Any model using Delivery_Status, Days_for_shipping_(real) or shipping_date as inputs is leaking the answer. Honest late-delivery analysis uses only information known at order time (scheduled days, shipping mode, market, department, category).
+Dropped from clean file (PII / unusable): Customer_Email, Customer_Password, Customer_Street, Customer_Fname, Customer_Lname, Product_Description, Product_Image
+```
+
+## What is in this folder
+- `data/raw/` — the real source file(s), as downloaded.
+- `data/clean/` — cleaned fact table / sample produced by the pipeline.
+- `data/data_dictionary.md` — column meanings, grains, caveats.
+- `scripts/01_clean_analyse.py` — the full reproducible pipeline (clean + analyse + reconcile).
+- `sql/schema.sql` — PostgreSQL schema for the same model.
+- `sql/analysis_queries.sql` — the key analytical queries in SQL.
+- `powerbi/model.md` — star schema, DAX measures and page plan (no .pbix in this repo; build it from this document).
+- `excel/` — Excel dashboard workbook built from the real aggregates.
+- `output/` — aggregate CSVs, `kpis.txt`, `reconciliation.txt`.
+
+## Stack
+Power BI, DAX, Python (pandas), SQL, PostgreSQL, Excel. Built by Bhavya Patel.
