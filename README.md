@@ -75,3 +75,10 @@ Dropped from clean file (PII / unusable): Customer_Email, Customer_Password, Cus
 
 ## Stack
 Power BI, DAX, Python (pandas), SQL, PostgreSQL, Excel. Built by Bhavya Patel.
+
+## What I would do differently
+
+- The file used here came from a public Hugging Face mirror, not from Kaggle directly, and the CC0 licence rests on a single-source audit. I would re-download from Kaggle, re-run the pipeline, and confirm the licence before treating this as anything more than a portfolio piece.
+- There is no `.pbix` in this repo. I would build the Power BI report from `powerbi/model.md` and check every measure against `output/kpis.txt`.
+- I would build the honest late-delivery predictor this project deliberately avoids claiming: using only information known at order time (scheduled days, shipping mode, market, department, category), never Delivery_Status or actual shipping days, which leak the answer.
+- Product_Description is 100% missing and Order_Zipcode 86.24% missing, so both were dropped. I would check whether a newer extract of the same dataset fills those gaps before doing any product-level work.
